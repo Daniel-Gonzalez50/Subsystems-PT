@@ -9,6 +9,9 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -83,21 +86,35 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
     return motor.getVelocity().getValueAsDouble() > desiredSpeed;
   }
 
-  public void reportToSmartDashboard(LOG_LEVEL priority){
-  
+  public void reportToSmartDashboard(LOG_LEVEL level){
+    switch(level){
+      case OFF:
+        break;
+
+      case ALL:
+      case MEDIUM:
+      SmartDashboard.putNumber("Velocity", desiredSpeed);
+      SmartDashboard.putBoolean("Enabled", enabled);
+      case MINIMAL:
+    }
+
   }
 
   @Override
   public void initShuffleboard(LOG_LEVEL priority){
-    switch (priority){
+    if (priority == LOG_LEVEL.OFF){
+      return;
+    }
+    ShuffleboardTab tab = Shuffleboard.getTab("Flywheel");
+    switch (priority) {
       case OFF:
         break;
       case ALL:
-
+        tab.addNumber("Flywheel Speed", () -> getSpeed());
+        tab.addBoolean("Flywheel At Position", () -> atSpeed());
       case MEDIUM:
-      
+        tab.addNumber("Flywheel Target Speed", () -> getTargetSpeed());
       case MINIMAL:
     }
-
   }
 }
